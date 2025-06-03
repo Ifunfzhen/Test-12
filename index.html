@@ -12,171 +12,74 @@
       padding: 20px;
       text-align: center;
     }
-    h2 {
-      color: #333;
-    }
+
     .email-container {
       max-width: 600px;
-      margin: 20px auto;
+      margin: 0 auto;
       background: white;
-      padding: 15px;
+      padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       text-align: left;
     }
-    .email-item {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      transition: background-color 0.2s ease;
-    }
-    .email-item:hover {
-      background-color: #f0f8ff;
-    }
-    .email-item:last-child {
-      border-bottom: none;
-    }
-    .email-item strong {
-      font-size: 16px;
-      color: #1a73e8;
-    }
-    .email-item small {
-      display: block;
-      color: #666;
-      margin-top: 4px;
-    }
-    .email-body {
-      display: none;
-      padding: 12px;
-      margin-top: 10px;
-      background: #fdfdfd;
-      border-left: 4px solid #1a73e8;
-      border-radius: 8px;
+
+    .email-header {
+      font-size: 20px;
       color: #333;
-      white-space: pre-line;
-      font-size: 15px;
-      line-height: 1.6;
-      transition: all 0.3s ease-in-out;
-    }
-    .code-badge {
-      display: inline-block;
-      background-color: #000;
-      color: #fff;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-weight: bold;
-      font-family: monospace;
-      margin: 0 2px;
-      user-select: all;
-    }
-    .read-more {
-      color: #1a73e8;
-      font-size: 14px;
-      margin-top: 8px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-    .read-more:hover {
-      color: #0d47a1;
-      text-decoration: underline;
-    }
-    .read-more::after {
-      content: "▼";
-      font-size: 11px;
-      transition: transform 0.3s ease;
-    }
-    .read-more.open::after {
-      transform: rotate(180deg);
-    }
-    .refresh-message {
-      font-size: 12px;
-      color: #888;
       margin-bottom: 10px;
     }
+
+    .email-body {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .code-highlight {
+      display: block;
+      font-size: 22px;
+      font-weight: bold;
+      background-color: #1a73e8;
+      color: white;
+      padding: 8px 12px;
+      width: fit-content;
+      border-radius: 6px;
+      margin: 15px 0;
+      font-family: monospace;
+    }
+
+    .email-link {
+      color: #1a0dab;
+      text-decoration: underline;
+      cursor: pointer;
+    }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-  <h2>Inbox Viewer</h2>
   <div class="email-container">
-    <p id="refreshMessage" class="refresh-message">Memuat data...</p>
-    <div id="emailList">Memuat...</div>
+    <div class="email-header">Google Verification Code</div>
+    <div class="email-body">
+      Dear Google User,<br><br>
+
+      We received a request to access your Google Account 
+      <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span> through your email address.<br><br>
+
+      Your Google verification code is:
+      <span class="code-highlight">641104</span>
+
+      If you did not request this code, it is possible that someone else is trying to access the Google Account 
+      <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span>.<br><br>
+
+      <strong>Do not forward or give this code to anyone.</strong><br><br>
+
+      You received this message because this email address is listed as the recovery email for the Google Account 
+      <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span>.<br><br>
+
+      If that is incorrect, please click here to remove your email address from that Google Account.<br><br>
+
+      Sincerely yours,<br>
+      The Google Accounts team
+    </div>
   </div>
-
-  <script>
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7bFLy0pZLZlZOmg5bOydpIfwWdGwY8UnrIJRyyFlQOxa3zr9IFPGYrEUPBp_NzZnb017_c1LEazxF/pub?output=csv';
-
-    function escapeHtml(text) {
-      const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return text.replace(/[&<>"']/g, m => map[m]);
-    }
-
-    function formatHasil(text) {
-      if (!text) return "";
-
-      let escaped = escapeHtml(text);
-      escaped = escaped.replace(/\. /g, ".<br><br>");
-      escaped = escaped.replace(/\n/g, "<br><br>");
-      escaped = escaped.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
-
-      return escaped;
-    }
-
-    function loadData() {
-      fetch(sheetURL)
-        .then(res => res.text())
-        .then(csvText => {
-          const results = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-          const data = results.data;
-          const container = document.getElementById("emailList");
-          container.innerHTML = "";
-
-          data.forEach((row, index) => {
-            const dari = row["Dari"] || "";
-            const subjek = row["Subjek"] || "";
-            const tanggal = row["Tanggal"] || "";
-            const hasil = row["Hasil"] || "";
-
-            const formattedHasil = formatHasil(hasil);
-
-            const itemHTML = `
-              <div class="email-item">
-                <strong>${subjek}</strong>
-                <small>${dari} - ${tanggal}</small>
-                <span class="read-more" id="toggle-${index}" onclick="toggleEmail(${index})">Baca Selengkapnya</span>
-                <div id="email-body-${index}" class="email-body">${formattedHasil}</div>
-              </div>
-            `;
-            container.innerHTML += itemHTML;
-          });
-
-          document.getElementById("refreshMessage").innerText =
-            "Terakhir diperbarui: " + new Date().toLocaleTimeString();
-        });
-    }
-
-    function toggleEmail(index) {
-      const body = document.getElementById(`email-body-${index}`);
-      const toggle = document.getElementById(`toggle-${index}`);
-      const isOpen = body.style.display === "block";
-
-      body.style.display = isOpen ? "none" : "block";
-      toggle.innerText = isOpen ? "Baca Selengkapnya" : "Tutup";
-      toggle.classList.toggle("open", !isOpen);
-    }
-
-    window.onload = () => {
-      loadData();
-      setInterval(loadData, 60000);
-    };
-  </script>
 </body>
 </html>
