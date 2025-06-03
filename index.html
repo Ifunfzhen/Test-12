@@ -3,143 +3,83 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Daftar Email Masuk</title>
+  <title>Highlight Kode & Email Link</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
       margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
+      padding: 40px 20px;
+      color: #333;
+      line-height: 1.6;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
     }
     h2 {
-      color: #2e7d32;
+      color: #2e7d32; /* hijau gelap */
+      margin-bottom: 20px;
       text-align: center;
     }
-    .email-card {
-      background: white;
-      padding: 16px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    .email-header {
-      margin-bottom: 8px;
-    }
-    .email-header strong {
-      color: #007BFF;
+    p {
+      margin-bottom: 1.2em;
       font-size: 16px;
     }
-    .email-header small {
-      color: #666;
-      display: block;
-      margin-top: 4px;
-    }
-    .email-snippet {
-      color: #333;
-    }
-    .read-more {
-      color: #1a73e8;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 8px;
-      display: inline-block;
-    }
-    .email-body {
-      display: none;
-      margin-top: 10px;
-      background: #fafafa;
-      padding: 12px;
-      border-left: 4px solid #2e7d32;
-      border-radius: 6px;
-      white-space: pre-wrap;
-    }
     .code-badge {
-      background-color: #000;
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-family: 'Courier New', monospace;
+      background-color: #4caf50; /* hijau terang */
+      color: white;
+      padding: 6px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-family: 'Segoe UI Mono', monospace;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      user-select: all;
       display: inline-block;
-      margin: 4px 0;
+      font-size: 18px;
+      letter-spacing: 2px;
+      margin: 0 4px;
     }
-    .email-link {
-      color: #1a73e8;
-      font-weight: bold;
+    a.email-link {
+      color: #1a73e8; /* biru Google */
       text-decoration: none;
+      font-weight: 600;
     }
-    .email-link:hover {
+    a.email-link:hover {
       text-decoration: underline;
-    }
-    .refresh-time {
-      font-size: 12px;
-      text-align: center;
-      color: #777;
-      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>Daftar Email Masuk</h2>
-  <div class="refresh-time" id="refreshMessage">Memuat...</div>
-  <div id="emailList">Memuat email...</div>
-</div>
+  <h2>Google Verification Code</h2>
 
-<script>
-function loadEmails() {
-  fetch('URL_CSV_PUBLIKMU')
-    .then(res => res.text())
-    .then(text => {
-      const rows = text.trim().split('\n').slice(1);
-      const container = document.getElementById("emailList");
-      container.innerHTML = "";
-      rows.forEach((row, index) => {
-        const cols = row.split(',');
-        const subject = cols[0] || '';
-        const sender = cols[1] || '';
-        const date = cols[2] || '';
-        const snippet = cols[3] || '';
-        const body = (cols[4] || '').replace(/\*(\d{4,6})\*/g, '<span class="code-badge">$1</span>')
-                                    .replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a class="email-link" href="mailto:$1">$1</a>');
+  <p>Dear Google User,</p>
 
-        const item = `
-          <div class="email-card">
-            <div class="email-header">
-              <strong>${subject}</strong>
-              <small>${sender} - ${date}</small>
-            </div>
-            <div class="email-snippet">${snippet}</div>
-            <span class="read-more" onclick="toggleEmail(${index})" id="toggle-${index}">Baca Selengkapnya</span>
-            <div class="email-body" id="email-body-${index}">${body}</div>
-          </div>`;
-        container.innerHTML += item;
+  <p>We received a request to access your Google Account <span class="email-text">bgpbanten.fasil00027@pkb.belajar.id</span> through your email address. Your Google verification code is:</p>
+
+  <p><span class="code-badge">641104</span></p>
+
+  <p>If you did not request this code, it is possible that someone else is trying to access the Google Account <span class="email-text">bgpbanten.fasil00027@pkb.belajar.id</span>. Do not forward or give this code to anyone.</p>
+
+  <p>You received this message because this email address is listed as the recovery email for the Google Account <span class="email-text">bgpbanten.fasil00027@pkb.belajar.id</span>. If that is incorrect, please click here to remove your email address from that Google Account.</p>
+
+  <p>Sincerely yours,</p>
+  <p><em>The Google Accounts team</em></p>
+
+  <script>
+    // Fungsi ganti teks email jadi link
+    function linkifyEmails() {
+      const emailElements = document.querySelectorAll('.email-text');
+      emailElements.forEach(el => {
+        const email = el.textContent.trim();
+        const link = document.createElement('a');
+        link.href = 'mailto:' + email;
+        link.textContent = email;
+        link.className = 'email-link';
+        el.parentNode.replaceChild(link, el);
       });
-    });
-}
+    }
 
-function toggleEmail(index) {
-  const body = document.getElementById(`email-body-${index}`);
-  const toggle = document.getElementById(`toggle-${index}`);
-  const isHidden = body.style.display === 'none' || body.style.display === '';
-  body.style.display = isHidden ? 'block' : 'none';
-  toggle.textContent = isHidden ? 'Tutup' : 'Baca Selengkapnya';
-}
-
-function autoRefresh() {
-  loadEmails();
-  const now = new Date().toLocaleTimeString();
-  document.getElementById("refreshMessage").textContent = `Terakhir diperbarui: ${now}`;
-}
-
-window.onload = () => {
-  autoRefresh();
-  setInterval(autoRefresh, 60000);
-};
-</script>
+    window.onload = linkifyEmails;
+  </script>
 </body>
 </html>
