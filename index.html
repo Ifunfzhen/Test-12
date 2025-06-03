@@ -5,33 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Google Verification Code</title>
   <style>
-    /* ...style sama seperti sebelumnya... */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f0e6; /* krem lembut */
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      color: white; /* default tulisan putih */
+    }
+    h2 {
+      color: #222222; /* hitam gelap */
+      margin-bottom: 10px;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #423d36; /* coklat gelap supaya kontras, tapi kalem */
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      text-align: left;
+      color: white; /* override jika ada */
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .email-item {
+      padding: 14px 10px;
+      border-bottom: 1px solid #665e4e;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .email-item:last-child {
+      border-bottom: none;
+    }
+    .email-item:hover {
+      background-color: #5c5649;
+    }
+    .email-item strong {
+      font-size: 18px;
+      color: #fafafa;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .email-item small {
+      display: block;
+      color: #d1cfc9;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
+    .email-body {
+      display: none;
+      margin-top: 10px;
+      background: #8e856d;
+      border-radius: 8px;
+      padding: 15px 18px;
+      color: white;
+      white-space: pre-line;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      box-shadow: inset 0 0 10px #6f6a56;
+    }
     .code-badge {
-      background-color: #000;
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 7px;
-      font-weight: 700;
-      font-family: monospace;
-      font-size: 20px;
-      letter-spacing: 2px;
-      user-select: all;
       display: inline-block;
-      margin: 10px 0;
+      background-color: #000000;
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-weight: 900;
+      font-family: monospace;
+      font-size: 22px;
+      letter-spacing: 3px;
+      user-select: all;
+      margin: 12px 0;
     }
     .email-link {
-      color: #1a73e8;
+      color: #4dc3ff;
       text-decoration: underline;
       cursor: pointer;
       user-select: text;
       font-weight: 600;
     }
+    .read-more {
+      color: #a9d18e;
+      font-size: 14px;
+      margin-top: 6px;
+      display: inline-block;
+      user-select: none;
+      font-weight: 600;
+    }
+    .refresh-message {
+      font-size: 12px;
+      color: #bbb;
+      margin-bottom: 10px;
+      font-style: italic;
+      text-align: center;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-  <!-- container dan elemen lain tetap sama -->
+  <h2>Google Verification Code</h2>
+  <div class="email-container">
+    <p id="refreshMessage" class="refresh-message">Memuat data...</p>
+    <div id="emailList">Memuat...</div>
+  </div>
+
   <script>
-    // Fungsi escapeHtml tetap sama
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7bFLy0pZLZlZOmg5bOydpIfwWdGwY8UnrIJRyyFlQOxa3zr9IFPGYrEUPBp_NzZnb017_c1LEazxF/pub?output=csv';
+
     function escapeHtml(text) {
       const map = {
         '&': '&amp;',
@@ -43,17 +125,20 @@
       return text.replace(/[&<>"']/g, m => map[m]);
     }
 
-    // Update formatHasil seperti ini:
     function formatHasil(text) {
       if (!text) return "";
 
       let escaped = escapeHtml(text);
 
+      // Pisah paragraf dengan double newline (\n\n atau \r\n\r\n)
       const paragraphs = escaped.split(/\r?\n\r?\n/);
 
       const formattedParagraphs = paragraphs.map(para => {
+        // Wrap kode 6 digit dengan badge hitam
         para = para.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
+        // Highlight email dengan warna biru
         para = para.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, `<span class="email-link">$1</span>`);
+        // "click here" jadi link biru
         para = para.replace(/click here/gi, `<a href="#" class="email-link">click here</a>`);
         return para;
       });
@@ -61,7 +146,57 @@
       return formattedParagraphs.join("<br><br>");
     }
 
-    // Load data dan fungsi toggle tetap sama, gak perlu diubah
+    function loadData() {
+      fetch(sheetURL)
+        .then(res => res.text())
+        .then(csvText => {
+          const results = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+          });
+          const data = results.data;
+          const container = document.getElementById("emailList");
+          container.innerHTML = "";
+
+          data.forEach((row, index) => {
+            const dari = row["Dari"] || "";
+            const subjek = row["Subjek"] || "";
+            const tanggal = row["Tanggal"] || "";
+            const hasil = row["Hasil"] || "";
+
+            const formattedHasil = formatHasil(hasil);
+
+            const itemHTML = `
+              <div class="email-item">
+                <strong>${subjek}</strong>
+                <small>${dari} - ${tanggal}</small>
+                <span class="read-more" id="toggle-${index}" onclick="toggleEmail(${index})">Baca Selengkapnya</span>
+                <div id="email-body-${index}" class="email-body">${formattedHasil}</div>
+              </div>
+            `;
+            container.innerHTML += itemHTML;
+          });
+
+          document.getElementById("refreshMessage").innerText = "Terakhir diperbarui: " + new Date().toLocaleTimeString();
+        })
+        .catch(err => {
+          document.getElementById("refreshMessage").innerText = "Gagal memuat data.";
+          console.error("Error load CSV:", err);
+        });
+    }
+
+    function toggleEmail(index) {
+      const body = document.getElementById(`email-body-${index}`);
+      const toggle = document.getElementById(`toggle-${index}`);
+      const isOpen = body.style.display === "block";
+      body.style.display = isOpen ? "none" : "block";
+      toggle.innerText = isOpen ? "Baca Selengkapnya" : "Tutup";
+    }
+
+    window.onload = () => {
+      loadData();
+      setInterval(loadData, 60000);
+    };
   </script>
 </body>
 </html>
