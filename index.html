@@ -7,80 +7,98 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      background-color: #e8f0fe; /* background lebih lembut */
       margin: 0;
       padding: 20px;
       text-align: center;
+      color: #202124;
     }
     h2 {
-      color: #333;
+      color: #1967d2;
+      margin-bottom: 10px;
+      font-weight: 700;
     }
     .email-container {
-      max-width: 600px;
+      max-width: 650px;
       margin: 20px auto;
       background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgb(25 103 210 / 0.15);
       text-align: left;
     }
     .email-item {
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
+      padding: 15px 0;
+      border-bottom: 1px solid #dfe1e5;
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
     .email-item:last-child {
       border-bottom: none;
     }
+    .email-item:hover {
+      background-color: #f1f3f4;
+    }
     .email-item strong {
-      font-size: 16px;
-      color: #1a73e8;
+      font-size: 18px;
+      color: #1967d2;
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 700;
     }
     .email-item small {
       display: block;
-      color: #666;
-      margin-top: 4px;
+      color: #5f6368;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-style: italic;
     }
     .email-body {
       display: none;
-      padding: 10px;
-      margin-top: 10px;
-      background: #f9f9f9;
-      border-radius: 5px;
-      color: #333;
-      white-space: pre-line;
+      background-color: #f8f9fa; /* latar isi email */
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-top: 12px;
+      color: #202124;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 15px;
+      line-height: 1.7;
+      white-space: normal;
+      box-shadow: inset 0 0 8px rgb(0 0 0 / 0.05);
     }
     .code-badge {
       display: inline-block;
       background-color: #000;
       color: #fff;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-weight: bold;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 700;
       font-family: monospace;
-      margin: 0 2px;
+      margin: 0 4px;
       user-select: all;
+      letter-spacing: 1.2px;
+      font-size: 16px;
     }
     .email-link {
-      color: #1a0dab;
+      color: #1967d2;
       text-decoration: underline;
       cursor: pointer;
+      user-select: text;
     }
     .read-more {
-      color: #1a73e8;
+      color: #1967d2;
       font-size: 14px;
-      margin-top: 5px;
+      margin-top: 8px;
       display: inline-block;
       cursor: pointer;
       user-select: none;
+      font-weight: 600;
     }
     .refresh-message {
       font-size: 12px;
-      color: #888;
+      color: #70757a;
       margin-bottom: 10px;
+      font-style: italic;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -107,28 +125,38 @@
       return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    // Format isi "hasil" jadi rapi, highlight kode angka & email
+    // Format isi hasil jadi paragraf terpisah dan highlight kode & email
     function formatHasil(text) {
       if (!text) return "";
 
       let escaped = escapeHtml(text);
 
-      // Ganti titik + spasi jadi paragraf baru
-      escaped = escaped.replace(/\. /g, ".<br><br>");
+      // Pecah jadi paragraf, cari titik diikuti spasi / newline, ubah ke <p> per paragraf
+      // Jadi kita split dulu paragraf berdasarkan \n atau . spasi
+      // Tapi karena sudah pakai <br><br> sebelumnya, ganti dengan <p> saja
 
-      // Ganti newline jadi paragraf baru
-      escaped = escaped.replace(/\n/g, "<br><br>");
+      // Ganti \n jadi tanda unik sementara
+      escaped = escaped.replace(/\n+/g, "###NEWLINE###");
 
-      // Highlight kode verifikasi 6 digit (badge hitam)
-      escaped = escaped.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
+      // Ganti ". " juga jadi tanda unik
+      escaped = escaped.replace(/\. /g, ".###NEWLINE###");
+
+      // Split paragraf berdasarkan tanda unik
+      const paras = escaped.split("###NEWLINE###").filter(p => p.trim().length > 0);
+
+      // Bungkus paragraf dengan <p>
+      let result = paras.map(p => `<p>${p.trim()}</p>`).join("");
+
+      // Highlight kode verifikasi 6 digit
+      result = result.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
 
       // Highlight alamat email jadi biru underline
-      escaped = escaped.replace(
+      result = result.replace(
         /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
         `<span class="email-link">$1</span>`
       );
 
-      return escaped;
+      return result;
     }
 
     function loadData() {
@@ -180,7 +208,7 @@
 
     window.onload = () => {
       loadData();
-      setInterval(loadData, 60000); // refresh tiap 60 detik
+      setInterval(loadData, 60000);
     };
   </script>
 </body>
