@@ -7,99 +7,77 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f5f0e6; /* krem lembut */
+      background-color: #f9f4e7;
       margin: 0;
       padding: 20px;
       text-align: center;
-      color: white; /* default tulisan putih */
+      color: #222;
     }
     h2 {
-      color: #222222; /* hitam gelap */
-      margin-bottom: 10px;
+      color: #222;
     }
     .email-container {
       max-width: 600px;
       margin: 20px auto;
-      background: #423d36; /* coklat gelap supaya kontras, tapi kalem */
-      padding: 20px 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       text-align: left;
-      color: white; /* override jika ada */
-      font-size: 15px;
-      line-height: 1.5;
     }
     .email-item {
-      padding: 14px 10px;
-      border-bottom: 1px solid #665e4e;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
     .email-item:last-child {
       border-bottom: none;
     }
-    .email-item:hover {
-      background-color: #5c5649;
-    }
     .email-item strong {
-      font-size: 18px;
-      color: #fafafa;
-      display: block;
-      margin-bottom: 5px;
+      font-size: 16px;
+      color: #1a73e8;
     }
     .email-item small {
       display: block;
-      color: #d1cfc9;
-      margin-bottom: 8px;
-      font-style: italic;
+      color: #666;
+      margin-top: 4px;
     }
     .email-body {
       display: none;
+      padding: 10px;
       margin-top: 10px;
-      background: #8e856d;
-      border-radius: 8px;
-      padding: 15px 18px;
-      color: white;
+      background: #fefefe;
+      border-radius: 5px;
+      color: #222;
       white-space: pre-line;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 15px;
+      font-size: 14px;
       line-height: 1.6;
-      box-shadow: inset 0 0 10px #6f6a56;
     }
     .code-badge {
       display: inline-block;
-      background-color: #000000;
+      background-color: #000;
       color: #fff;
-      padding: 8px 18px;
-      border-radius: 10px;
-      font-weight: 900;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-weight: bold;
       font-family: monospace;
-      font-size: 22px;
-      letter-spacing: 3px;
-      user-select: all;
-      margin: 12px 0;
-    }
-    .email-link {
-      color: #4dc3ff;
-      text-decoration: underline;
-      cursor: pointer;
-      user-select: text;
-      font-weight: 600;
+      margin: 10px 0;
     }
     .read-more {
-      color: #a9d18e;
+      color: #1a73e8;
       font-size: 14px;
-      margin-top: 6px;
+      margin-top: 5px;
       display: inline-block;
-      user-select: none;
-      font-weight: 600;
     }
     .refresh-message {
       font-size: 12px;
-      color: #bbb;
+      color: #888;
       margin-bottom: 10px;
-      font-style: italic;
-      text-align: center;
+    }
+    a.email-link {
+      color: #1a73e8;
+      text-decoration: underline;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
@@ -122,7 +100,7 @@
         '"': '&quot;',
         "'": '&#039;'
       };
-      return text.replace(/[&<>"']/g, m => map[m]);
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
     function formatHasil(text) {
@@ -130,20 +108,17 @@
 
       let escaped = escapeHtml(text);
 
-      // Pisah paragraf dengan double newline (\n\n atau \r\n\r\n)
-      const paragraphs = escaped.split(/\r?\n\r?\n/);
+      // Format seperti paragraf sesuai contoh
+      escaped = escaped.replace(/\n{2,}/g, '<br><br>'); // jika ada double newline
+      escaped = escaped.replace(/\n/g, '<br>');
 
-      const formattedParagraphs = paragraphs.map(para => {
-        // Wrap kode 6 digit dengan badge hitam
-        para = para.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
-        // Highlight email dengan warna biru
-        para = para.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, `<span class="email-link">$1</span>`);
-        // "click here" jadi link biru
-        para = para.replace(/click here/gi, `<a href="#" class="email-link">click here</a>`);
-        return para;
-      });
+      // Highlight kode 6 digit
+      escaped = escaped.replace(/\b(\d{6})\b/g, `<div class="code-badge">$1</div>`);
 
-      return formattedParagraphs.join("<br><br>");
+      // Ubah email menjadi hyperlink
+      escaped = escaped.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, `<a href="mailto:$1" class="email-link">$1</a>`);
+
+      return escaped;
     }
 
     function loadData() {
@@ -178,10 +153,6 @@
           });
 
           document.getElementById("refreshMessage").innerText = "Terakhir diperbarui: " + new Date().toLocaleTimeString();
-        })
-        .catch(err => {
-          document.getElementById("refreshMessage").innerText = "Gagal memuat data.";
-          console.error("Error load CSV:", err);
         });
     }
 
