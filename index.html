@@ -13,14 +13,12 @@
       color: #222222;
       text-align: center;
     }
-
     h2 {
       color: #1a1a1a;
       margin-bottom: 20px;
       font-weight: 700;
       font-size: 32px;
     }
-
     .email-container {
       max-width: 680px;
       margin: 0 auto;
@@ -34,35 +32,30 @@
       line-height: 1.65;
       user-select: text;
     }
-
     .email-item {
       margin-bottom: 30px;
       border-bottom: 1px solid #ddd6c6;
       padding-bottom: 25px;
     }
-
     .email-item:last-child {
       border-bottom: none;
       margin-bottom: 0;
       padding-bottom: 0;
     }
-
     .email-item strong {
       font-size: 22px;
       color: #333333;
       display: block;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       font-weight: 700;
     }
-
     .email-item small {
       display: block;
       color: #666;
-      margin-bottom: 18px;
+      margin-bottom: 15px;
       font-size: 14px;
       font-style: italic;
     }
-
     .read-more {
       color: #1a73e8;
       font-size: 16px;
@@ -73,7 +66,6 @@
       margin-bottom: 15px;
       display: inline-block;
     }
-
     .email-body {
       display: none;
       margin-top: 15px;
@@ -83,7 +75,6 @@
       color: #222;
       line-height: 1.7;
     }
-
     .code-badge {
       background-color: #000;
       color: #fff;
@@ -97,7 +88,6 @@
       display: inline-block;
       margin: 10px 0;
     }
-
     .email-link {
       color: #1a73e8;
       text-decoration: underline;
@@ -105,44 +95,117 @@
       user-select: text;
       font-weight: 600;
     }
+    a.email-link {
+      color: #1a73e8;
+      text-decoration: underline;
+    }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
   <h2>Google Verification Code</h2>
   <div class="email-container">
-    <div class="email-item">
-      <strong>Google Verification Code</strong>
-      <small>Google Accounts team</small>
-      <span class="read-more" onclick="toggleEmailBody(this)">Baca Selengkapnya</span>
-      <div class="email-body">
-Dear Google User,
-
-We received a request to access your Google Account <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span> through your email address. Your Google verification code is:
-
-<span class="code-badge">641104</span>
-
-If you did not request this code, it is possible that someone else is trying to access the Google Account <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span>. Do not forward or give this code to anyone.
-
-You received this message because this email address is listed as the recovery email for the Google Account <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span>. If that is incorrect, please <a href="#" class="email-link">click here</a> to remove your email address from that Google Account.
-
-Sincerely yours,
-
-The Google Accounts team
-      </div>
-    </div>
+    <p id="refreshMessage" style="font-size:14px;color:#555;margin-bottom:10px;">Memuat data...</p>
+    <div id="emailList">Memuat...</div>
   </div>
 
-<script>
-  function toggleEmailBody(el) {
-    const body = el.nextElementSibling;
-    if (body.style.display === "block") {
-      body.style.display = "none";
-      el.textContent = "Baca Selengkapnya";
-    } else {
-      body.style.display = "block";
-      el.textContent = "Tutup";
+  <script>
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7bFLy0pZLZlZOmg5bOydpIfwWdGwY8UnrIJRyyFlQOxa3zr9IFPGYrEUPBp_NzZnb017_c1LEazxF/pub?output=csv';
+
+    // Escape HTML chars supaya aman di HTML
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
     }
-  }
-</script>
+
+    // Highlight kode 6 digit dan email seperti contoh
+    function formatHasil(text) {
+      if (!text) return "";
+
+      let escaped = escapeHtml(text);
+
+      // Ganti baris baru dengan <br><br> untuk paragraf
+      escaped = escaped.replace(/\n/g, "<br><br>");
+
+      // Highlight kode 6 digit (angka berdiri sendiri)
+      escaped = escaped.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
+
+      // Highlight email (contoh pattern simple email, sesuaikan jika perlu)
+      const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+      escaped = escaped.replace(emailPattern, `<span class="email-link">$1</span>`);
+
+      // Highlight "click here" link (ubah jadi hyperlink klik disini)
+      escaped = escaped.replace(/click here/gi, `<a href="#" class="email-link">click here</a>`);
+
+      return escaped;
+    }
+
+    function loadData() {
+      fetch(sheetURL)
+        .then(res => res.text())
+        .then(csvText => {
+          const results = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+          });
+          const data = results.data;
+          const container = document.getElementById("emailList");
+          container.innerHTML = "";
+
+          if (!data.length) {
+            container.innerHTML = "<p>Tidak ada data email.</p>";
+            return;
+          }
+
+          data.forEach((row, index) => {
+            const dari = row["Dari"] || "";
+            const subjek = row["Subjek"] || "";
+            const tanggal = row["Tanggal"] || "";
+            const hasil = row["Hasil"] || "";
+
+            const formattedHasil = formatHasil(hasil);
+
+            const itemHTML = `
+              <div class="email-item">
+                <strong>${escapeHtml(subjek)}</strong>
+                <small>${escapeHtml(dari)} - ${escapeHtml(tanggal)}</small>
+                <span class="read-more" onclick="toggleEmailBody(this)">Baca Selengkapnya</span>
+                <div class="email-body">${formattedHasil}</div>
+              </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', itemHTML);
+          });
+
+          document.getElementById("refreshMessage").textContent = "Terakhir diperbarui: " + new Date().toLocaleTimeString();
+        })
+        .catch(() => {
+          document.getElementById("emailList").innerHTML = "<p>Gagal memuat data.</p>";
+          document.getElementById("refreshMessage").textContent = "";
+        });
+    }
+
+    function toggleEmailBody(el) {
+      const body = el.nextElementSibling;
+      if (body.style.display === "block") {
+        body.style.display = "none";
+        el.textContent = "Baca Selengkapnya";
+      } else {
+        body.style.display = "block";
+        el.textContent = "Tutup";
+      }
+    }
+
+    window.onload = () => {
+      loadData();
+      setInterval(loadData, 60000);
+    };
+  </script>
 </body>
 </html>
