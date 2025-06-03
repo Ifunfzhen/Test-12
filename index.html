@@ -15,6 +15,18 @@
     }
     h2 {
       color: #222;
+      margin: 0;
+    }
+    .title-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .title-container img {
+      width: 32px;
+      height: 32px;
     }
     .email-container {
       max-width: 600px;
@@ -83,7 +95,11 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-  <h2>Google Verification Code</h2>
+  <div class="title-container">
+    <img src="https://i.imgur.com/KyMGUEL.png" alt="Google Icon">
+    <h2>Google Verification Code</h2>
+  </div>
+
   <div class="email-container">
     <p id="refreshMessage" class="refresh-message">Memuat data...</p>
     <div id="emailList">Memuat...</div>
@@ -108,14 +124,9 @@
 
       let escaped = escapeHtml(text);
 
-      // Format seperti paragraf sesuai contoh
-      escaped = escaped.replace(/\n{2,}/g, '<br><br>'); // jika ada double newline
+      escaped = escaped.replace(/\n{2,}/g, '<br><br>');
       escaped = escaped.replace(/\n/g, '<br>');
-
-      // Highlight kode 6 digit
       escaped = escaped.replace(/\b(\d{6})\b/g, `<div class="code-badge">$1</div>`);
-
-      // Ubah email menjadi hyperlink
       escaped = escaped.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, `<a href="mailto:$1" class="email-link">$1</a>`);
 
       return escaped;
