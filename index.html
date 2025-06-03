@@ -6,7 +6,7 @@
   <title>Google Verification Code</title>
   <style>
     body {
-      font-family: 'Segoe UI', 'Roboto', 'Georgia', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f9f4e7;
       margin: 0;
       padding: 20px;
@@ -50,18 +50,19 @@
       border-radius: 5px;
       color: #222;
       white-space: pre-line;
-      font-size: 15px;
-      line-height: 1.7;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
     }
     .code-badge {
       display: inline-block;
       background-color: #000;
       color: #fff;
-      padding: 4px 10px;
-      border-radius: 4px;
+      padding: 6px 12px;
+      border-radius: 5px;
       font-weight: bold;
       font-family: monospace;
-      margin: 0 4px;
+      margin: 10px 0;
     }
     .read-more {
       color: #1a73e8;
@@ -107,15 +108,15 @@
 
       let escaped = escapeHtml(text);
 
-      // Badge kode tetap berada dalam kalimat
-      escaped = escaped.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
-
-      // Email ke hyperlink biru
-      escaped = escaped.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, `<a href="mailto:$1" class="email-link">$1</a>`);
-
-      // Format newline ke <br> agar terstruktur seperti contoh
-      escaped = escaped.replace(/\n{2,}/g, '<br><br>');
+      // Format seperti paragraf sesuai contoh
+      escaped = escaped.replace(/\n{2,}/g, '<br><br>'); // jika ada double newline
       escaped = escaped.replace(/\n/g, '<br>');
+
+      // Highlight kode 6 digit
+      escaped = escaped.replace(/\b(\d{6})\b/g, `<div class="code-badge">$1</div>`);
+
+      // Ubah email menjadi hyperlink
+      escaped = escaped.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, `<a href="mailto:$1" class="email-link">$1</a>`);
 
       return escaped;
     }
