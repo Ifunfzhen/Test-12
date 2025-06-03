@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daftar Email Masuk</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      color: #2e7d32;
+      text-align: center;
+    }
+    .email-card {
+      background: white;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .email-header {
+      margin-bottom: 8px;
+    }
+    .email-header strong {
+      color: #007BFF;
+      font-size: 16px;
+    }
+    .email-header small {
+      color: #666;
+      display: block;
+      margin-top: 4px;
+    }
+    .email-snippet {
+      color: #333;
+    }
+    .read-more {
+      color: #1a73e8;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+      display: inline-block;
+    }
+    .email-body {
+      display: none;
+      margin-top: 10px;
+      background: #fafafa;
+      padding: 12px;
+      border-left: 4px solid #2e7d32;
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+    .code-badge {
+      background-color: #000;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      display: inline-block;
+      margin: 4px 0;
+    }
+    .email-link {
+      color: #1a73e8;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .email-link:hover {
+      text-decoration: underline;
+    }
+    .refresh-time {
+      font-size: 12px;
+      text-align: center;
+      color: #777;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Daftar Email Masuk</h2>
+  <div class="refresh-time" id="refreshMessage">Memuat...</div>
+  <div id="emailList">Memuat email...</div>
+</div>
+
+<script>
+function loadEmails() {
+  fetch('URL_CSV_PUBLIKMU')
+    .then(res => res.text())
+    .then(text => {
+      const rows = text.trim().split('\n').slice(1);
+      const container = document.getElementById("emailList");
+      container.innerHTML = "";
+      rows.forEach((row, index) => {
+        const cols = row.split(',');
+        const subject = cols[0] || '';
+        const sender = cols[1] || '';
+        const date = cols[2] || '';
+        const snippet = cols[3] || '';
+        const body = (cols[4] || '').replace(/\*(\d{4,6})\*/g, '<span class="code-badge">$1</span>')
+                                    .replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a class="email-link" href="mailto:$1">$1</a>');
+
+        const item = `
+          <div class="email-card">
+            <div class="email-header">
+              <strong>${subject}</strong>
+              <small>${sender} - ${date}</small>
+            </div>
+            <div class="email-snippet">${snippet}</div>
+            <span class="read-more" onclick="toggleEmail(${index})" id="toggle-${index}">Baca Selengkapnya</span>
+            <div class="email-body" id="email-body-${index}">${body}</div>
+          </div>`;
+        container.innerHTML += item;
+      });
+    });
+}
+
+function toggleEmail(index) {
+  const body = document.getElementById(`email-body-${index}`);
+  const toggle = document.getElementById(`toggle-${index}`);
+  const isHidden = body.style.display === 'none' || body.style.display === '';
+  body.style.display = isHidden ? 'block' : 'none';
+  toggle.textContent = isHidden ? 'Tutup' : 'Baca Selengkapnya';
+}
+
+function autoRefresh() {
+  loadEmails();
+  const now = new Date().toLocaleTimeString();
+  document.getElementById("refreshMessage").textContent = `Terakhir diperbarui: ${now}`;
+}
+
+window.onload = () => {
+  autoRefresh();
+  setInterval(autoRefresh, 60000);
+};
+</script>
+</body>
+</html>
