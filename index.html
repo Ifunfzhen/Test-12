@@ -5,238 +5,144 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Google Verification Code</title>
   <style>
-    /* Background hijau dengan pola daun sederhana via SVG data URI */
     body {
       font-family: Arial, sans-serif;
-      background-color: #0b3d0b; /* hijau gelap dasar */
-      background-image:
-        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24"><path fill="%23007700" fill-opacity="0.15" d="M12 2s-3 5-3 7 3 7 3 7 3-5 3-7-3-7-3-7z"/></svg>'),
-        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24"><path fill="%23004400" fill-opacity="0.15" d="M12 2s-3 5-3 7 3 7 3 7 3-5 3-7-3-7-3-7z"/></svg>');
-      background-repeat: repeat, repeat;
-      background-position: 0 0, 30px 30px;
-      background-size: 60px 60px;
+      background-color: #f5f0e6; /* krem lembut */
       margin: 0;
       padding: 20px;
+      color: #222222;
       text-align: center;
-      color: #fff;
-      text-shadow: 0 0 3px rgba(0,0,0,0.7);
     }
 
     h2 {
-      color: #fff;
-      margin-bottom: 15px;
+      color: #1a1a1a;
+      margin-bottom: 20px;
       font-weight: 700;
-      font-size: 30px;
-      letter-spacing: 1.2px;
-      text-shadow: 0 0 6px rgba(0,0,0,0.8);
+      font-size: 32px;
     }
 
     .email-container {
-      max-width: 650px;
-      margin: 20px auto;
-      background: rgba(10, 50, 10, 0.85); /* hijau gelap transparan */
-      padding: 30px 35px;
-      border-radius: 14px;
-      box-shadow: 0 7px 25px rgba(0, 0, 0, 0.8);
+      max-width: 680px;
+      margin: 0 auto;
+      background: #fff9f0;
+      padding: 35px 40px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
       text-align: left;
-      color: #fff;
+      color: #222;
       font-size: 17px;
-      line-height: 1.7;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.65;
+      user-select: text;
     }
 
     .email-item {
-      padding: 20px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #ddd6c6;
+      padding-bottom: 25px;
     }
 
     .email-item:last-child {
       border-bottom: none;
-    }
-
-    .email-item:hover {
-      background-color: rgba(30, 90, 30, 0.6);
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
 
     .email-item strong {
       font-size: 22px;
-      color: #ccffcc;
+      color: #333333;
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       font-weight: 700;
-      text-shadow: 0 0 4px rgba(0,0,0,0.7);
     }
 
     .email-item small {
       display: block;
-      color: #aaddaa;
-      margin-bottom: 14px;
-      font-size: 15px;
+      color: #666;
+      margin-bottom: 18px;
+      font-size: 14px;
       font-style: italic;
-      text-shadow: 0 0 2px rgba(0,0,0,0.6);
+    }
+
+    .read-more {
+      color: #1a73e8;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+      text-decoration: underline;
+      margin-bottom: 15px;
+      display: inline-block;
     }
 
     .email-body {
       display: none;
-      background-color: rgba(0, 30, 0, 0.8);
-      border-radius: 12px;
-      padding: 25px 30px;
-      margin-top: 18px;
-      color: #ddf7dd;
+      margin-top: 15px;
+      white-space: pre-line;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-size: 17px;
-      line-height: 1.9;
-      box-shadow: inset 0 0 15px rgba(102, 204, 102, 0.7);
-      white-space: normal;
-      text-shadow: 0 0 3px rgba(0,0,0,0.8);
+      font-size: 16px;
+      color: #222;
+      line-height: 1.7;
     }
 
     .code-badge {
-      display: inline-block;
       background-color: #000;
       color: #fff;
-      padding: 8px 18px;
-      border-radius: 8px;
+      padding: 6px 14px;
+      border-radius: 7px;
       font-weight: 700;
       font-family: monospace;
-      margin: 0 8px;
-      user-select: all;
-      letter-spacing: 2px;
       font-size: 20px;
-      text-shadow: none;
+      letter-spacing: 2px;
+      user-select: all;
+      display: inline-block;
+      margin: 10px 0;
     }
 
     .email-link {
-      color: #a8ff9e;
+      color: #1a73e8;
       text-decoration: underline;
       cursor: pointer;
       user-select: text;
       font-weight: 600;
-      text-shadow: 0 0 5px rgba(168, 255, 158, 0.7);
-    }
-
-    .read-more {
-      color: #a8ff9e;
-      font-size: 16px;
-      margin-top: 14px;
-      display: inline-block;
-      cursor: pointer;
-      user-select: none;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-shadow: 0 0 6px rgba(168, 255, 158, 0.8);
-    }
-
-    .refresh-message {
-      font-size: 13px;
-      color: #a8ff9e;
-      margin-bottom: 18px;
-      font-style: italic;
-      text-align: center;
-      text-shadow: 0 0 3px rgba(168, 255, 158, 0.8);
-    }
-
-    .email-body p {
-      margin: 1em 0;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
   <h2>Google Verification Code</h2>
   <div class="email-container">
-    <p id="refreshMessage" class="refresh-message">Memuat data...</p>
-    <div id="emailList">Memuat...</div>
+    <div class="email-item">
+      <strong>Google Verification Code</strong>
+      <small>Google Accounts team</small>
+      <span class="read-more" onclick="toggleEmailBody(this)">Baca Selengkapnya</span>
+      <div class="email-body">
+Dear Google User,
+
+We received a request to access your Google Account <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span> through your email address. Your Google verification code is:
+
+<span class="code-badge">641104</span>
+
+If you did not request this code, it is possible that someone else is trying to access the Google Account <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span>. Do not forward or give this code to anyone.
+
+You received this message because this email address is listed as the recovery email for the Google Account <span class="email-link">bgpbanten.fasil00027@pkb.belajar.id</span>. If that is incorrect, please <a href="#" class="email-link">click here</a> to remove your email address from that Google Account.
+
+Sincerely yours,
+
+The Google Accounts team
+      </div>
+    </div>
   </div>
 
-  <script>
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7bFLy0pZLZlZOmg5bOydpIfwWdGwY8UnrIJRyyFlQOxa3zr9IFPGYrEUPBp_NzZnb017_c1LEazxF/pub?output=csv';
-
-    function escapeHtml(text) {
-      const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      };
-      return text.replace(/[&<>"']/g, m => map[m]);
+<script>
+  function toggleEmailBody(el) {
+    const body = el.nextElementSibling;
+    if (body.style.display === "block") {
+      body.style.display = "none";
+      el.textContent = "Baca Selengkapnya";
+    } else {
+      body.style.display = "block";
+      el.textContent = "Tutup";
     }
-
-    function formatHasil(text) {
-      if (!text) return "";
-
-      let escaped = escapeHtml(text);
-
-      escaped = escaped.replace(/\n+/g, "###NEWLINE###");
-      escaped = escaped.replace(/\. /g, ".###NEWLINE###");
-
-      const paras = escaped.split("###NEWLINE###").filter(p => p.trim().length > 0);
-
-      let result = paras.map(p => `<p>${p.trim()}</p>`).join("");
-
-      result = result.replace(/\b(\d{6})\b/g, `<span class="code-badge">$1</span>`);
-
-      result = result.replace(
-        /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
-        `<span class="email-link">$1</span>`
-      );
-
-      return result;
-    }
-
-    function loadData() {
-      fetch(sheetURL)
-        .then(res => res.text())
-        .then(csvText => {
-          const results = Papa.parse(csvText, {
-            header: true,
-            skipEmptyLines: true,
-          });
-          const data = results.data;
-          const container = document.getElementById("emailList");
-          container.innerHTML = "";
-
-          data.forEach((row, index) => {
-            const dari = row["Dari"] || "";
-            const subjek = row["Subjek"] || "";
-            const tanggal = row["Tanggal"] || "";
-            const hasil = row["Hasil"] || "";
-
-            const formattedHasil = formatHasil(hasil);
-
-            const itemHTML = `
-              <div class="email-item">
-                <strong>${subjek}</strong>
-                <small>${dari} - ${tanggal}</small>
-                <span class="read-more" id="toggle-${index}" onclick="toggleEmail(${index})">Baca Selengkapnya</span>
-                <div id="email-body-${index}" class="email-body">${formattedHasil}</div>
-              </div>
-            `;
-            container.innerHTML += itemHTML;
-          });
-
-          document.getElementById("refreshMessage").innerText = "Terakhir diperbarui: " + new Date().toLocaleTimeString();
-        })
-        .catch(() => {
-          document.getElementById("refreshMessage").innerText = "Gagal memuat data.";
-        });
-    }
-
-    function toggleEmail(index) {
-      const body = document.getElementById(`email-body-${index}`);
-      const toggle = document.getElementById(`toggle-${index}`);
-      const isOpen = body.style.display === "block";
-      body.style.display = isOpen ? "none" : "block";
-      toggle.innerText = isOpen ? "Baca Selengkapnya" : "Tutup";
-    }
-
-    window.onload = () => {
-      loadData();
-      setInterval(loadData, 60000);
-    };
-  </script>
+  }
+</script>
 </body>
 </html>
